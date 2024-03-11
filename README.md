@@ -1,15 +1,12 @@
 **Message - A Modern Chat Application**
-![Message Logo]([https://yourdomain.com/message-logo.png](https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0))
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-<img src="[https://yourdomain.com/message-logo.png](https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0)" alt="Message Logo" width="200"/>
 Message is a sleek and modern chat application built with React on the frontend and Node.js on the backend. It allows users to communicate seamlessly while offering additional features such as profile setup, authentication, user search, and profile picture customization.
 
-**Features**
-💬 Real-time Chatting: Engage in real-time conversations with other users.
-🛠️ Profile Setup: Customize your profile with a username and profile picture.
-🔍 User Search: Easily find other users to start chatting with.
-🔒 Authentication: Secure login system to protect user accounts.
-🗄️ Database Integration: Utilizes MySQL for efficient data storage and retrieval.
+**Features** <br>
+💬 Real-time Chatting: Engage in real-time conversations with other users. <br>
+🛠️ Profile Setup: Customize your profile with a username and profile picture. <br>
+🔍 User Search: Easily find other users to start chatting with. <br>
+🔒 Authentication: Secure login system to protect user accounts. <br>
+🗄️ Database Integration: Utilizes MySQL for efficient data storage and retrieval. <br>
 
 
 **Installation**
@@ -21,14 +18,15 @@ Clone the repository:
 ```bash
 Copy code
 git clone https://github.com/yourusername/message.git
-Navigate to the project directory:
 ```
+Navigate to the project directory:
+
 
 ```bash
 Copy code
 cd message
-Install dependencies for both frontend and backend:
 ```
+Install dependencies for both frontend and backend:
 
 ```bash
 Copy code
@@ -76,5 +74,5 @@ Create a new Pull Request.
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-Authors
-Mohil Mokaria
+##Author
+- Mohil Mokaria - [MohilMokaria](https://github.com/MohilMokaria)
