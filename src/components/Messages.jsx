@@ -34,9 +34,9 @@ const Messages = () => {
   const loadMoreMessages = () => {
     setIsLoading(true);
     setTimeout(() => {
-      setLoadedMessagesCount(prevCount => prevCount + 10);
+      setLoadedMessagesCount(prevCount => prevCount + 20);
       setIsLoading(false);
-      scrollToBottom(); // Scroll to bottom after loading more messages
+      scrollToBottom();
     }, 1000);
   };
 
@@ -44,7 +44,7 @@ const Messages = () => {
     <div className="chat-box-home">
       {isLoading && <div>Loading...</div>}
       {!isLoading && loadedMessagesCount < messages.length && (
-        <button onClick={loadMoreMessages}>Load Previous</button>
+        <button className='btn btn-outline-info mb-2' onClick={loadMoreMessages}>Load Previous</button>
       )}
       {messages.slice(Math.max(messages.length - loadedMessagesCount, 0)).map((message, index) => (
         <Message key={index} message={message} />

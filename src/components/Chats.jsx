@@ -20,7 +20,7 @@ const Chats = () => {
     if (currentUser && user) {
       if (currentUser.uid === user.uid) {
         toast.warning("Can't Message Your Self");
-        setLoading(true);
+        setLoading(false);
         return;
       }
       const combinedId = (currentUser.uid > user.uid) ? (currentUser.uid + user.uid) : (user.uid + currentUser.uid);
