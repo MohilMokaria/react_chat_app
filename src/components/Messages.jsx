@@ -5,11 +5,13 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 const Messages = () => {
+  let loadMessageCount = 20;
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadedMessagesCount, setLoadedMessagesCount] = useState(10);
+  const [loadedMessagesCount, setLoadedMessagesCount] = useState(loadMessageCount);
   const { data } = useContext(ChatContext);
   const messagesEndRef = useRef(null);
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", data.chatId), (doc) => {
@@ -24,19 +26,23 @@ const Messages = () => {
   }, [data.chatId]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (isFirstLoad.current || loadedMessagesCount === loadMessageCount) {
+      scrollToBottom();
+      isFirstLoad.current = false;
+    }
+  }, [messages, loadedMessagesCount]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isFirstLoad.current || loadedMessagesCount === loadMessageCount) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const loadMoreMessages = () => {
     setIsLoading(true);
     setTimeout(() => {
-      setLoadedMessagesCount(prevCount => prevCount + 20);
+      setLoadedMessagesCount(prevCount => prevCount + loadMessageCount);
       setIsLoading(false);
-      scrollToBottom();
     }, 1000);
   };
 
