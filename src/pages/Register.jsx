@@ -2,14 +2,14 @@ import React, { useState, useRef } from "react";
 import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth, storage, db } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDocs, setDoc, where, query, collection } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import { isEmail } from 'validator';
 import profilePic from "../assets/user.jpg";
 
 
 const Register = () => {
-  const [err, setErr] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imageSrc, setImageSrc] = useState(profilePic);
@@ -39,7 +39,7 @@ const Register = () => {
     const password = e.target[3].value;
 
     if (file == null) {
-      toast.error("Image Not Selected!");
+      toast.error("Select a Profile Picture!");
       setLoading(false);
       return;
     }
@@ -50,19 +50,25 @@ const Register = () => {
       return;
     }
 
-    if (!email) {
-      toast.error("Invalid Email !");
+    if (!isEmail(email)) {
+      toast.error("Enter Valid Email!");
       setLoading(false);
       return;
     }
 
     if (!password || password.length < 6) {
-      toast.error("Password Should be Greater than 6 Characters!");
+      toast.error("Atlest 6 Characters Password Required!");
       setLoading(false);
       return;
     }
 
     try {
+
+      const displayNameExists = await checkDisplayNameExists(displayName);
+      if (displayNameExists) {
+        throw new Error('The display name is already in use. Please choose a different one.');
+      }
+
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
       const storageRef = ref(storage, displayName);
@@ -88,29 +94,58 @@ const Register = () => {
       navigate("/");
 
     } catch (error) {
-      console.error("Error during registration:", error);
-      toast.error("Something Went Wrong!");
-      setErr(true);
+      if (error.code === "auth/email-already-in-use") {
+        toast.error("The email is already in use. Please try a different email.");
+      }else{
+        toast.error(error.message);
+      }
       setLoading(false);
     }
   };
+
+  const checkDisplayNameExists = async (displayName) => {
+    try {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("displayName", "==", displayName));
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error("Error checking display name:", error);
+      return false;
+    }
+  };
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
 
+    if (!isEmail(email)) {
+      toast.error("Enter Valid Email!");
+      setLoading(false);
+      return;
+    }
+
+    if (!password) {
+      toast.error("Password Required to Login!");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
       setLoading(false);
-      toast.success("Logged In!")
+      toast.success("Logged in as "+email);
       navigate("/");
 
     } catch (error) {
-      console.error("Error during login:", error);
-      toast.error("Something Went Wrong!");
-      setErr(true);
+      if (error.code === "auth/invalid-credential") {
+        toast.error("Invalid Login Credentials!");
+      }else{
+        toast.error(error.message);
+      }
       setLoading(false);
     }
   };
@@ -119,24 +154,31 @@ const Register = () => {
     setLoading(true);
     const email = document.getElementById("login-email").value;
     if (!email) {
-      toast.error("Enter Email to Reset Password!");
-    } else {
-      toast.warning("Make Sure account with "+email+" exists");
-      sendPasswordResetEmail(auth, email).then((data) => {
-        toast.success("Sent Email to " + email);
-      }).catch((error) => {
-      toast.error(error);
-      });
+      setLoading(false);
+      return toast.error("Enter Email to Reset Password!");
     }
-    setLoading(false);
-  }
+    if (!isEmail(email)) {
+      setLoading(false);
+      return toast.error("Enter a valid email address!");
+    }
+    await sendPasswordResetEmail(auth, email)
+      .then((data) => {
+        setLoading(false);
+        toast.success("Password Reset Mail Sent to " + email);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.message);
+      });
+    toast.warning("Make Sure " + email + " is Valid");
+  };
 
 
   return (
     <div id='signup-div'>
       {loading && (
         <div className="loading-overlay">
-          <div>Loading...</div>
+          <div>Please Wait...</div>
         </div>
       )}
       <div className="card-body d-flex flex-column my-card-signup">
@@ -218,7 +260,7 @@ const Register = () => {
                   id="signup-email"
                   placeholder="Your Email"
                   name="email"
-                  required
+
                 />
                 <label htmlFor="signup-email" className="my-form-label my-form-label-signup">
                   Your Email
@@ -259,7 +301,6 @@ const Register = () => {
                   id="login-email"
                   placeholder="Registered Email"
                   name="email"
-                  required
                 />
                 <label htmlFor="login-email" className="my-form-label my-form-label-signup">
                   Registered Email
@@ -273,7 +314,6 @@ const Register = () => {
                   id="login-password"
                   placeholder="Account Password"
                   name="password"
-                  required
                 />
                 <label htmlFor="login-password" className="my-form-label my-form-label-signup">
                   Account Password
