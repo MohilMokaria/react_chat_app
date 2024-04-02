@@ -26,14 +26,14 @@ const Home = () => {
       <Navbar />
       <div className="section-wrapper">
         {isMobileView ? (
-          <div style={{display: data.isChatOpen ? 'none' : 'block'}}>
+          <div style={{display: data.isChatOpen ? 'none' : 'block', height:'100%'}}>
             <Sidebar />
           </div>
         ) : (
           <Sidebar display='block' />
         )}
         {isMobileView ? (
-          <div style={{display : data.isChatOpen ? 'block' : 'none'}}>
+          <div style={{display : data.isChatOpen ? 'block' : 'none', height:'100%'}}>
             <Chat />
           </div>
         ) : (
